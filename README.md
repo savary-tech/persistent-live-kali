@@ -1,5 +1,7 @@
 # persistent-live-kali
 
+Save your self the long read by watching this video instead ---> 
+
 Turn a freshly flashed Kali Linux Live USB into a persistent Kali environment automatically.
 
 No fdisk
@@ -54,8 +56,8 @@ Most Linux systems already have these installed.
 Clone the repo:
 
 ```
-git clone https://github.com/yourusername/kali-persistence-auto.git
-cd kali-persistence-auto
+git clone https://github.com/savary-tech/persistent-live-kali/
+cd persistent-live-kali
 ```
 
 Make executable:
@@ -169,13 +171,3 @@ Kali persistence setup normally requires manual partitioning and several command
 People frequently mess it up or accidentally wipe the wrong disk.
 
 This tool makes it a one-command setup.
-
----
-
-## License
-
-MIT
-
----
-
-If you want I can also write a short repo tagline and add shields badges (python version, license, stars) so the repo looks more legit.

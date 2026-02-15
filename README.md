@@ -1,106 +1,115 @@
 # persistent-live-kali
 
-Save your self the long read by watching this video instead ---> 
+Automatically enables persistence on a Kali Linux Live USB.
 
-Turn a freshly flashed Kali Linux Live USB into a persistent Kali environment automatically.
+This script finds the `ext4` partition labeled **persistence**, mounts it, creates the required `persistence.conf` file, and safely unmounts the drive.
 
-No fdisk
-No parted
 No manual mounting
-No persistence headaches
-
-This script detects the USB, creates the persistence partition, formats it as ext4, writes `persistence.conf`, and prepares the drive so Kali actually remembers your files and tools across reboots.
+No guessing device names
+No editing files inside DiskGenius or hex editors
 
 ---
 
-## What it does
+## What problem this solves
 
-After you flash Kali Live ISO to a USB, the system normally boots in a temporary session where everything is erased after reboot.
+After creating a Kali persistent partition, Kali still will NOT save data unless the file below exists:
 
-This tool:
+```
+persistence.conf
+```
 
-1. Detects the Kali USB drive
-2. Creates a third partition using remaining free space
-3. Formats it as `ext4` labeled `persistence`
-4. Writes the required configuration file
-5. Prepares the drive for **Live system (persistence)** boot mode
+with exactly:
+
+```
+/ union
+```
+
+Creating this file is usually annoying because Windows cannot write to ext4 partitions.
+
+This tool automates it completely.
 
 ---
 
 ## Requirements
 
-You must run this on Linux:
+Run on Linux:
 
 * Kali Linux (recommended)
 * Ubuntu / Debian
-* WSL2 (works)
+* WSL2 (works perfectly)
 
-You need root privileges.
+Root privileges required.
+
+Tools required (normally preinstalled):
 
 ```
-python3
-lsblk
-parted
-mkfs.ext4
-mount
 blkid
-udevadm
+findmnt
+mount
+umount
+sync
+python3
 ```
-
-Most Linux systems already have these installed.
 
 ---
 
-## Install
+## Installation
 
 Clone the repo:
 
 ```
-git clone https://github.com/savary-tech/persistent-live-kali/
-cd persistent-live-kali
+git clone https://github.com/yourusername/kali-persistence-conf.git
+cd kali-persistence-conf
 ```
 
 Make executable:
 
 ```
-chmod +x kali_persistence_setup.py
+chmod +x make_persistence_conf.py
 ```
 
 ---
 
 ## Usage
 
-### 1) Flash Kali to USB first
+### Automatic mode (recommended)
 
-Use Rufus (DD mode) or dd:
+Plug in your Kali USB and run:
 
 ```
-sudo dd if=kali-linux-xxxx-live-amd64.iso of=/dev/sdX bs=4M status=progress
-sync
+sudo ./make_persistence_conf.py
 ```
 
-Replace `/dev/sdX` with your USB device.
+The script will:
+
+1. Find the ext4 partition labeled `persistence`
+2. Mount it
+3. Create `persistence.conf`
+4. Unmount safely
 
 ---
 
-### 2) Run the script
+### Specify device manually
+
+If multiple drives exist:
 
 ```
-sudo python3 kali_persistence_setup.py
+sudo ./make_persistence_conf.py --device /dev/sdb3
 ```
 
-If multiple drives are connected:
+---
+
+### Custom mount location
 
 ```
-lsblk
-sudo python3 kali_persistence_setup.py --device /dev/sdb
+sudo ./make_persistence_conf.py --mount /mnt/my_usb
 ```
 
 ---
 
 ## After running
 
-Reboot and select:
+Reboot your computer and boot the USB using:
 
 ```
 Live system (persistence)
@@ -108,66 +117,77 @@ Live system (persistence)
 
 ---
 
-## Test persistence
+## Verify persistence works
 
 Inside Kali:
 
 ```
-touch works.txt
+touch testfile
 reboot
 ```
 
-If `works.txt` still exists → persistence works.
+If `testfile` still exists after reboot → success.
 
 ---
 
 ## Safety
 
-The script tries to auto-detect the USB drive, but disk operations are dangerous.
+The script only writes a single small file and does NOT modify partitions.
 
-**Always verify the device before running:**
+It will refuse to run unless:
 
-```
-lsblk
-```
-
-Do NOT run on your main disk.
+* the partition exists
+* filesystem is ext4
 
 ---
 
 ## Troubleshooting
 
-### Persistence option missing
+### Script says no persistence partition found
 
-You booted wrong mode.
-Select: `Live system (persistence)`
-
----
-
-### Changes not saving
-
-Partition label must be `persistence`
-File must contain:
+Your partition label must be:
 
 ```
-/ union
+persistence
+```
+
+Check with:
+
+```
+lsblk -f
 ```
 
 ---
 
-### Script refuses device
+### Kali still not saving data
 
-Specify it manually:
+You probably booted:
 
 ```
-sudo python3 kali_persistence_setup.py --device /dev/sdX
+Live system
+```
+
+Instead of:
+
+```
+Live system (persistence)
 ```
 
 ---
 
 ## Why this exists
 
-Kali persistence setup normally requires manual partitioning and several commands.
-People frequently mess it up or accidentally wipe the wrong disk.
+Windows cannot write to ext4 partitions.
+Most persistence setup guides require manual mounting in Linux.
 
-This tool makes it a one-command setup.
+This tool reduces the final persistence setup step to a single command.
+
+---
+
+## License
+
+MIT
+
+---
+
+If you want, I can also write a short repo description + tags so GitHub search actually surfaces it when people google “kali persistence not working”.

@@ -2,6 +2,8 @@
 
 Automatically enables persistence on a Kali Linux Live USB.
 
+Don't wanna read? Watch this video instead ---> https://www.youtube.com/watch?v=ptIaGTus3dY
+
 This script finds the `ext4` partition labeled **persistence**, mounts it, creates the required `persistence.conf` file, and safely unmounts the drive.
 
 No manual mounting
